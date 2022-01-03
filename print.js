@@ -3,7 +3,7 @@ const PImage = require('pureimage');
 const client = require('https');
 
 let url = "https://vr.josh.earth/webxr-experiments/physics/jinglesmash.thumbnail.png"
-let filepath = "output6.png"
+let filepath = "calendar.png"
 
 const font = PImage.registerFont('CourierNewPS-BoldMT.ttf','MyFont');
 
@@ -40,3 +40,5 @@ const fun = function(ddd, callback) {
     })
   })
 };
+
+module.exports = { fun }
