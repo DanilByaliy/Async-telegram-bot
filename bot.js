@@ -23,7 +23,7 @@ bot.onText(/\/pic (.+)/, (msg, [source, match]) => {
 
   let [mons, year] = match.split('.');
   let pic = calendar.makeCurrentTable(mons, year);
-  print.fun(pic, send.bind(null, msg.chat.id));
+  print.printCalendar(pic, send.bind(null, msg.chat.id));
 })
 
 const send = function(msgchatid) {

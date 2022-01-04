@@ -1,85 +1,88 @@
-let mons = [1, 4, 4, 0, 2, 5, 0, 3, 6, 1, 4, 6];
+const CONSTANTS = require('./constants.js');
     
-function getCodeMons(value) {
-    let code = mons[Number(value) - 1];
-    return code;
+function getMonthCode(month) {
+    return CONSTANTS.CODE_OF_MONTHS[Number(month)];
 };
     
-function getCodeYear(value) {
-    let index = (3 - (value.slice(0, 2) % 4)) * 2;
-    let twoNum = (Number(value.slice(2)));
-    let code = ((index + twoNum + Math.floor(twoNum/4)) % 7);
-    return code;
+function getYearCode(year) {
+    year = correctionYear(year);
+    let centuryIndex = (3 - (year.slice(0, 2) % 4)) * 2;
+    let lastTwoDigitsOfYear = (Number(year.slice(2)));
+    return (centuryIndex + lastTwoDigitsOfYear + Math.floor(lastTwoDigitsOfYear/4)) 
+        % CONSTANTS.NUMBER_DAYS_OF_WEEK;
 };
     
-function checkLeapYear(value) {
-    if ((value % 4 === 0 && value % 100 !== 0) || (value % 4 === 0 && value % 400 === 0)) {
-        return true;
-    } 
-    return false;
+function correctionYear(year) {
+    return ((year.length < CONSTANTS.MIN_YEAR_LENGHT) ? '00' : '') + year;
+}
+
+function checkLeapYear(year) {
+    year = correctionYear(year);
+    return (year % CONSTANTS.INDEX_CHECK_LEAP_YEAR === 0 
+        && (year % CONSTANTS.INDEX_CHECK_LEAP_YEAR_2 !== 0) 
+        || (year % CONSTANTS.INDEX_CHECK_LEAP_YEAR_3 === 0))
 };
-    
-function correctionLeapYear(year, numberMons) {
-    let correction = 0;
-    if (checkLeapYear(year) && Number(numberMons) < 3) {
-        correction = -1;
+
+function correctionLeapYear(year, month) {
+    if (checkLeapYear(year) && Number(month) < 3) {
+        return -1;
     };
-return correction;
+    return 0;
 };
     
-function getDay(value, correction, codeMons, codeYear) {
-    let day = (correction + Number(value) + codeMons + codeYear) % 7;
-    day = ((day + 5) % 7) + 1;
-    return day;
+function getDayOfWeek(numberDay, correction, codeMons, codeYear) {
+    let dayOfWeek = (correction + Number(numberDay) + codeMons + codeYear) % 7;
+    return ((dayOfWeek + 5) % CONSTANTS.NUMBER_DAYS_OF_WEEK) + 1;
 };
     
-function getDayOfMonth(month, year) {
+function getNumberOfDaysPerMonth(month, year) {
     let dayOfMonth;
+    year = correctionYear(year);
     month = Number(month);
     if (month < 8){
         if (month !== 2) {
-            dayOfMonth = 30 + (month % 2);             
-        } else dayOfMonth = checkLeapYear(year) ? 29 : 28;
-    } else dayOfMonth = 31 - (month % 2);
+            dayOfMonth = CONSTANTS.NUM_DAYS_OF_SMALL_MONTHS + (month % 2);             
+        } else dayOfMonth = checkLeapYear(year) ? CONSTANTS.NUM_DAYS_OF_BIG_FEBRUARY : CONSTANTS.NUM_DAYS_OF_SMALL_FEBRUARY;
+    } else dayOfMonth = CONSTANTS.NUM_DAYS_OF_BIG_MONTHS - (month % 2);
     return dayOfMonth;
 };
 
-function makeTable(a, n) {
-    let a51 = g11;
-    for (let i = 1; i < a; i++){
-      a51 = a51 + '  ' + b;
+function makeTable(firstDay, numberOfDays) {
+    let table = top;
+    let counterNum = 1;
+    for (let i = 1; i < firstDay; i++){
+        table += '  ' + betweenColumns;
     }
-    for (let i = a; i <= 42; i++) {
-      let s = i - a + 1;
-      let se = n + a - 1;
-      a51 = a51 + ((s < 10) ? '0' : '') + (( i > se) ? '  ': s) + (((i % 7 === 0) && (i/7 !== 6)) ? g2 : b) ;
+    for (let i = firstDay; i <= CONSTANTS.NUM_CALENDAR_CELLS; i++) {
+      let lastDay = numberOfDays + firstDay;
+      table = table + ((counterNum < CONSTANTS.NUMBER_OF_DIGIT) ? '0' : '') + (( i >= lastDay) ? '  ': counterNum) 
+      + (((i % CONSTANTS.NUMBER_DAYS_OF_WEEK === 0) && (i/CONSTANTS.NUMBER_DAYS_OF_WEEK !== 6)) ? betweenLines : betweenColumns);
+      counterNum++;
     }
-    a51 = a51 + '.' + g3;
-    return a51;
+    table += '.' + bottom;
+    return table;
 }
   
-function makeCurrentTable(mon, yearCur) {
-    let year = ((yearCur.length < 3) ? '00' : '') + yearCur;
-    let correction = correctionLeapYear(year, mon);
-    let codeMons = getCodeMons(mon);
-    let codeYear = getCodeYear(year);
-    let i = getDayOfMonth(mon, year);
-    let u = getDay('01', correction, codeMons, codeYear);
-
-    return makeTable(u, i);
+function makeCurrentTable(month, year) {
+    let correction = correctionLeapYear(year, month);
+    let codeMonth = getMonthCode(month);
+    let codeYear = getYearCode(year);
+    let numberOfDays = getNumberOfDaysPerMonth(month, year);
+    let firstDay = getDayOfWeek(CONSTANTS.STRING_FIRST_NUMBER, correction, codeMonth, codeYear);
+    return makeTable(firstDay, numberOfDays);
 }
 
 module.exports = { makeCurrentTable };
 
-let g11 = `┌───  ────  ─────  ─────  ────  ───┐.
+let top = `┌───  ────  ─────  ─────  ────  ───┐.
 │ ПН    ВТ    СР    ЧТ    ПТ    СБ     НД │.
 ├─   ─┬─   ─┬─   ─┬─   ─┬─   ─┬─   ─┬─   ─┤.
 │ `
-let g2 = `  │.
+let betweenLines = `  │.
 ├─   ─┼─   ─┼─   ─┼─   ─┼─   ─┼─   ─┼─   ─┤.
 │ `;
 
-let g3 = `
+let bottom = `
 └─   ─┴─   ─┴─   ─┴─   ─┴─   ─┴─   ─┴─   ─┘.
 `;
-let b = '  │ ';
+let betweenColumns = '  │ ';
