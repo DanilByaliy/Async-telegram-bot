@@ -18,6 +18,8 @@
   "homepage": "https://github.com/DanilByaliy/Async-telegram-bot#readme",
   "dependencies": {
     "dotenv": "^10.0.0",
+    "gm": "^1.23.1",
+    "node": "^17.3.0",
     "node-telegram-bot-api": "^0.56.0"
   }
 }
