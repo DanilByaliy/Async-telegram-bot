@@ -38,11 +38,6 @@ bot.onText(/\/start/, (msg) => {
   bot.sendMessage(msg.chat.id, 'Send me your image');
 });
 
-bot.onText(/\/pic (.+)/, (msg, [source, match]) => {
-  bot.sendMessage(msg.chat.id, match);
-  bot.sendPhoto(msg.chat.id, './calendar.png')
-});
-
 bot.on('photo', (msg) => {
   bot.downloadFile(msg.photo.pop().file_id, './images').then((path) => {
     bot.sendMessage(msg.chat.id, 'What do you want to do with your image?', {
