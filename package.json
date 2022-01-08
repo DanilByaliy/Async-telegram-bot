@@ -1,23 +1,24 @@
 {
-  "name": "async-telegram-bot",
+  "name": "ff_bot",
   "version": "1.0.0",
-  "description": "",
-  "main": "bot.js",
+  "description": "random film finder bot",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DanilByaliy/Async-telegram-bot.git"
+    "url": "git+https://github.com/BogPin/ff_bot.git"
   },
-  "author": "",
+  "author": "Bohdan Pinchuk",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/DanilByaliy/Async-telegram-bot/issues"
+    "url": "https://github.com/BogPin/ff_bot/issues"
   },
-  "homepage": "https://github.com/DanilByaliy/Async-telegram-bot#readme",
+  "homepage": "https://github.com/BogPin/ff_bot#readme",
   "dependencies": {
-    "dotenv": "^10.0.0",
-    "node-telegram-bot-api": "^0.56.0"
+    "node-fetch": "^2.6.6",
+    "node-telegram-bot-api": "^0.56.0",
+    "request": "^2.88.2"
   }
 }
