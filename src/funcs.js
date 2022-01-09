@@ -48,7 +48,7 @@ const kinopoiskKeyWordLinkGenerator = (keyWords) => {
 };
 
 const filmInfo = (film) => {
-  if ( film === undefined ) return { poster: undefined, caption: 'Не найдено' }
+  if (film === undefined) return { poster: undefined, caption: 'Не найдено' };
   let genreOfFilm = '';
   for (const genre of film.genres) {
     if (film.genres.indexOf(genre) === film.genres.length - 1) {
@@ -125,7 +125,8 @@ const getFilmsByKeywords = async (keywords) => {
     else type = 'cериал';
     if (filtered.indexOf(film) !== filtered.length - 1) {
       msg += `${film.nameRu}, ${film.year}, тип: ${type}, рейтинг: ${film.rating}/10\n`;
-    } else msg += `${film.nameRu}, ${film.year}, тип: ${type}, рейтинг: ${film.rating}/10`;
+    } else
+      msg += `${film.nameRu}, ${film.year}, тип: ${type}, рейтинг: ${film.rating}/10`;
   }
   return msg.replace(/undefined/, 'отсутствует');
 };
@@ -134,7 +135,7 @@ const getFilmByTitle = async (title) => {
   const link = kinopoiskKeyWordLinkGenerator(title);
   const res = await makeRequest(options(link)).catch(loger);
   return filmInfo(res.films[0]);
-}
+};
 
 const randomFilm = (films) => films[Math.floor(Math.random() * films.length)];
 

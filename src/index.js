@@ -15,7 +15,7 @@ const {
 } = require('./funcs');
 
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN2, {
-  polling: true
+  polling: true,
 });
 bot.status = session.none;
 
@@ -41,7 +41,7 @@ bot.on('polling_error', (onerror) => {
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
   const oddText = defs.home.concat([['/start']]);
-  if (oddText.some(value => value[0] === msg.text)) return;
+  if (oddText.some((value) => value[0] === msg.text)) return;
   switch (bot.status) {
     case session.none:
       bot.sendMessage(chatId, 'Для работы с ботом выберите функцию👇', {
