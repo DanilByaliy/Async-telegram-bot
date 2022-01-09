@@ -1,4 +1,5 @@
 const CODE_OF_MONTHS = [null, 1, 4, 4, 0, 2, 5, 0, 3, 6, 1, 4, 6];
+const CODE_OF_CENTURY = [6, 4, 2, 0];
 const NUMBER_DAYS_OF_WEEK = 7;
 const MIN_YEAR_LENGHT = 3;
 const NUMBER_OF_DIGIT = 10;
@@ -11,9 +12,22 @@ const INDEX_CHECK_LEAP_YEAR = 4;
 const INDEX_CHECK_LEAP_YEAR_2 = 100;
 const INDEX_CHECK_LEAP_YEAR_3 = 400;
 const STRING_FIRST_NUMBER = '01';
+const FILE_CALENDAR_PATH = './calendar.png';
+const MESSAGE = 'Заждіть трішки...';
+const DOT = '.';
+const SEMICOLON = ';';
+const DOUBLE_ZERO = '00';
+const FILE_PARTS_PATH = './parts.txt';
+const MIN_MONTH = 8;
+const LAST_DAY = 6;
+const FOR_DAY = 5;
+const FOR_YEAR_CODE = 4;
+const MARCH = 3;
+const FEBRUARY = 2;
 
 module.exports = {
   CODE_OF_MONTHS,
+  CODE_OF_CENTURY,
   NUMBER_DAYS_OF_WEEK,
   MIN_YEAR_LENGHT,
   NUMBER_OF_DIGIT,
@@ -25,5 +39,17 @@ module.exports = {
   INDEX_CHECK_LEAP_YEAR,
   INDEX_CHECK_LEAP_YEAR_2,
   INDEX_CHECK_LEAP_YEAR_3,
-  STRING_FIRST_NUMBER
+  STRING_FIRST_NUMBER,
+  FILE_CALENDAR_PATH,
+  MESSAGE,
+  DOT,
+  SEMICOLON,
+  DOUBLE_ZERO,
+  FILE_PARTS_PATH,
+  MIN_MONTH,
+  LAST_DAY,
+  FOR_DAY,
+  FOR_YEAR_CODE,
+  MARCH,
+  FEBRUARY
 };

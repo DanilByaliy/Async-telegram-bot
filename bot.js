@@ -1,4 +1,5 @@
 const TelegramBot = require('node-telegram-bot-api');
+const CONSTANTS = require('./constants.js');
 require('dotenv').config();
 
 const calendar = require('./calendar.js');
@@ -18,14 +19,17 @@ const bot = new TelegramBot(token, {
   }
 });
 
-const send = function (msgchatid) {
-  bot.sendPhoto(msgchatid, './calendar.png');
-};
+bot.onText(/\/calendar (.+)/, (msg, [source, match]) => {
+  bot.sendMessage(msg.chat.id, CONSTANTS.MESSAGE);
 
-bot.onText(/\/pic (.+)/, (msg, [source, match]) => {
-  bot.sendMessage(msg.chat.id, 'Заждіть трішки...');
-
-  const [mons, year] = match.split('.');
-  const pic = calendar.makeCurrentTable(mons, year);
-  print.printCalendar(pic, send.bind(null, msg.chat.id));
+  const [month, year] = match.split(CONSTANTS.DOT);
+  calendar.readFile().then((value) => {
+    const table = calendar.makeCurrentTable(month, year, value);
+    return print.printCalendar(table);
+  }).then(() => {
+    bot.sendPhoto(msg.chat.id, CONSTANTS.FILE_CALENDAR_PATH);
+  });
 });
+
+// const pic = calendar.makeCurrentTable(mons, year);
+// print.printCalendar(pic, send.bind(null, msg.chat.id));
