@@ -89,5 +89,8 @@ module.exports = {
   imdbToKinopoiskPrelink:
     'https://kinopoiskapiunofficial.tech/api/v2.2/films?type=ALL&imdbId=',
   imdbToKinopoiskPostlink: '&page=1',
+  kinopoiskKeyWordPrelink:
+    'https://kinopoiskapiunofficial.tech/api/v2.1/films/search-by-keyword?keyword=',
+  kinopoiskKeyWordPostlink: '&page=1',
   kinopoiskApiPagesCount: 20,
 };

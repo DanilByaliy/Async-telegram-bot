@@ -1,7 +1,6 @@
 'use strict';
 
 const TelegramBot = require('node-telegram-bot-api');
-require('dotenv').config();
 const defs = require('./definitions');
 const {
   randomFilm,
@@ -9,9 +8,14 @@ const {
   mGetImdbFilms,
   getKinopoiskFilmFromImdb,
   sendFilm,
+  kinopoiskKeyWordLinkGenerator,
+  options,
+  makeRequest,
 } = require('./funcs');
 
-const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
+const bot = new TelegramBot('5005725004:AAHf6xAd8aZ3w7UO6_pksEA7g1X1e4H4Avc', {
+  polling: true,
+});
 
 bot.on('callback_query', async (query) => {
   const chatId = query.message.chat.id;
@@ -32,7 +36,21 @@ bot.on('polling_error', (onerror) => {
   console.log(onerror);
 });
 
-bot.onText(/Фильм по ключевым словам/, (msg) => {});
+bot.on('message', async (msg) => {
+  const filmsArr = [];
+  const link = kinopoiskKeyWordLinkGenerator(msg.text);
+  const res = await makeRequest(options(link)).catch((err) => console.log(err));
+
+  for (let page = 1; page <= res.pagesCount; page++) {
+    const res = await makeRequest(options).catch((err) => console.log(err));
+    filmsArr.push(...res.films);
+  }
+  const filtered = res.films.filter((value) => parseInt(value.rating) > 6);
+  for (const film of filtered) {
+    const cap = `Название: ${film.nameRu}\nГод выпуска: ${film.year}\nРейтинг: ${film.rating}`;
+    bot.sendPhoto(msg.chat.id, film.posterUrl, { caption: cap });
+  }
+});
 
 bot.onText(/Случайный фильм/, (msg) => {
   bot.sendMessage(msg.chat.id, 'Выберите жанр', {

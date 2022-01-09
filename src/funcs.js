@@ -41,6 +41,12 @@ const kinopoiskFromImdbLinkGenerator = (id) => {
   return preLink + id + postLink;
 };
 
+const kinopoiskKeyWordLinkGenerator = (keyWords) => {
+  const preLink = defs.kinopoiskKeyWordPrelink;
+  const postLink = defs.kinopoiskKeyWordPostlink;
+  return preLink + encodeURI(keyWords) + postLink;
+};
+
 const sendFilm = (film) => {
   let genreOfFilm = '';
   for (const genre of film.genres) {
@@ -103,5 +109,8 @@ module.exports = {
   mGetKinopoiskFilms,
   mGetImdbFilms,
   getKinopoiskFilmFromImdb,
-  sendFilm
+  sendFilm,
+  kinopoiskKeyWordLinkGenerator,
+  options,
+  makeRequest,
 };
