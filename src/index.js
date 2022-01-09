@@ -1,6 +1,7 @@
 'use strict';
 
 const TelegramBot = require('node-telegram-bot-api');
+require('dotenv').config();
 const defs = require('./definitions');
 const { session } = defs;
 const {
@@ -13,11 +14,10 @@ const {
   getFilmByTitle,
 } = require('./funcs');
 
-const bot = new TelegramBot('5005725004:AAHf6xAd8aZ3w7UO6_pksEA7g1X1e4H4Avc', {
+const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN2, {
   polling: true
 });
-
-let status = session.none;
+bot.status = session.none;
 
 bot.on('callback_query', async (query) => {
   const chatId = query.message.chat.id;
@@ -40,7 +40,9 @@ bot.on('polling_error', (onerror) => {
 
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
-  switch (status) {
+  const oddText = defs.home.concat([['/start']]);
+  if (oddText.some(value => value[0] === msg.text)) return;
+  switch (bot.status) {
     case session.none:
       bot.sendMessage(chatId, 'Для работы с ботом выберите функцию👇', {
         reply_markup: {
@@ -50,9 +52,8 @@ bot.on('message', async (msg) => {
       });
       break;
     case session.filmByTitle:
-      const filmInfo = getFilmByTitle(msg.text);
-      bot.sendPhoto(chatId, filmInfo.poster, { caption: filmInfo.caption })
-      status = session.none;
+      const filmInfo = await getFilmByTitle(msg.text);
+      bot.sendPhoto(chatId, filmInfo.poster, { caption: filmInfo.caption });
       break;
     case session.filmsByKeywords:
       const films = await getFilmsByKeywords(msg.text);
@@ -60,19 +61,19 @@ bot.on('message', async (msg) => {
       if (films !== '') messageText = films;
       else messageText = 'Ничего не найдено(';
       bot.sendMessage(chatId, messageText);
-      status = session.none;
       break;
   }
+  bot.status = session.none;
 });
 
 bot.onText(/Фильм по названию/, (msg) => {
   bot.sendMessage(msg.chat.id, 'Введите название фильма');
-  status = session.filmByTitle;
+  bot.status = session.filmByTitle;
 });
 
 bot.onText(/Фильмы по ключевым словам/, (msg) => {
-  bot.sendMessage(msg.chat.id, 'Введите название фильма');
-  status = session.filmsByKeywords;
+  bot.sendMessage(msg.chat.id, 'Введите ключевые слова');
+  bot.status = session.filmsByKeywords;
 });
 
 bot.onText(/Случайный фильм/, (msg) => {
@@ -81,6 +82,7 @@ bot.onText(/Случайный фильм/, (msg) => {
       inline_keyboard: defs.genres,
     },
   });
+  bot.status = session.none;
 });
 
 bot.onText(/\/start/, (msg) => {
@@ -91,4 +93,5 @@ bot.onText(/\/start/, (msg) => {
       resize_keyboard: true,
     },
   });
+  bot.status = session.none;
 });

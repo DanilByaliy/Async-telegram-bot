@@ -55,9 +55,10 @@ const filmInfo = (film) => {
       genreOfFilm += genre.genre;
     } else genreOfFilm += genre.genre + ', ';
   }
-  const caption =
+  const cap =
     `Название: ${film.nameRu}\nГод выпуска: ${film.year}\n` +
     `Рейтинг: ${film.ratingImdb}\nЖанры: ${genreOfFilm}`;
+  const caption = cap.replace(/undefined/, 'отсутствует');
   return { poster: film.posterUrl, caption };
 };
 
@@ -126,13 +127,12 @@ const getFilmsByKeywords = async (keywords) => {
       msg += `${film.nameRu}, ${film.year}, тип: ${type}, рейтинг: ${film.rating}/10\n`;
     } else msg += `${film.nameRu}, ${film.year}, тип: ${type}, рейтинг: ${film.rating}/10`;
   }
-  return msg;
+  return msg.replace(/undefined/, 'отсутствует');
 };
 
-const getFilmByTitle =  async (title) => {
+const getFilmByTitle = async (title) => {
   const link = kinopoiskKeyWordLinkGenerator(title);
   const res = await makeRequest(options(link)).catch(loger);
-  console.log(res.films[0]);
   return filmInfo(res.films[0]);
 }
 
