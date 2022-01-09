@@ -1,7 +1,9 @@
 const request = require('request');
 const defs = require('./definitions');
+const gm = require('gm');
+const fs = require('fs');
 
-const loger = (err) => console.log(err);
+//bohdan functions
 
 const memoize = (fn) => {
   const cache = Object.create(null);
@@ -75,7 +77,7 @@ const getKinopoiskFilms = async (genre) => {
   const kinopoiskFilmsArr = [];
   for (let page = 1; page <= defs.kinopoiskApiPagesCount; page++) {
     const link = kinopoiskLinkGenerator(genre, page);
-    const result = await makeRequest(options(link)).catch(loger);
+    const result = await makeRequest(options(link)).catch(console.log);
     kinopoiskFilmsArr.push(...result.items);
   }
   console.log({ length: kinopoiskFilmsArr.length });
@@ -90,7 +92,7 @@ const getImdbFilms = async (genre) => {
     url: imdbLinkGenerator(genre),
   };
   const imdbFilmsArr = [];
-  const result = await makeRequest(options).catch(loger);
+  const result = await makeRequest(options).catch(console.log);
   imdbFilmsArr.push(...result.results);
   console.log({ length: imdbFilmsArr.length });
   return imdbFilmsArr;
@@ -100,17 +102,17 @@ const mGetImdbFilms = memoize(getImdbFilms);
 
 const getKinopoiskFilmFromImdb = async (film) => {
   const link = kinopoiskFromImdbLinkGenerator(film.id);
-  const res = await makeRequest(options(link)).catch(loger);
+  const res = await makeRequest(options(link)).catch(console.log);
   return res.items[0];
 };
 
 const getFilmsByKeywords = async (keywords) => {
   const filmsArr = [];
   const link = kinopoiskKeyWordLinkGenerator(keywords);
-  const res = await makeRequest(options(link)).catch(loger);
+  const res = await makeRequest(options(link)).catch(console.log);
   filmsArr.push(...res.films);
   for (let page = 2; page <= res.pagesCount; page++) {
-    const res = await makeRequest(options(link)).catch(loger);
+    const res = await makeRequest(options(link)).catch(console.log);
     filmsArr.push(...res.films);
   }
   const filtered = res.films.filter((film) => {
@@ -133,21 +135,108 @@ const getFilmsByKeywords = async (keywords) => {
 
 const getFilmByTitle = async (title) => {
   const link = kinopoiskKeyWordLinkGenerator(title);
-  const res = await makeRequest(options(link)).catch(loger);
+  const res = await makeRequest(options(link)).catch(console.log);
   return filmInfo(res.films[0]);
 };
 
 const randomFilm = (films) => films[Math.floor(Math.random() * films.length)];
 
+const sendRandomFilm = async (bot, chatId, data) => {
+  bot.sendMessage(chatId, 'Ищем подходящий фильм 🎥');
+  let film;
+  if (data.api === 'kinopoisk') {
+    const films = await mGetKinopoiskFilms(data.genre).catch(console.log);
+    film = randomFilm(films);
+  } else {
+    const films = await mGetImdbFilms(data.genre).catch(console.log);
+    const randFilm = randomFilm(films);
+    film = await getKinopoiskFilmFromImdb(randFilm);
+  }
+  const info = filmInfo(film);
+  bot.sendPhoto(chatId, info.poster, { caption: info.caption });
+};
+
+//nikita functions
+
+const inlineButtonFilter = (oper, path) => ({
+  text: oper,
+  callback_data: JSON.stringify({ oper, path, t: 'photo' })
+});
+
+const inlineKeyboardFilters = path => {
+  const markup = {
+    inline_keyboard: [[]]
+  };
+  for (const elem of ['Sticker', 'Negative', 'Sepia']) {
+    markup.inline_keyboard[0].push(inlineButtonFilter(elem, path));
+  }
+  return markup;
+};
+
+const makeSticker = (path, newPath) => new Promise((resolve, reject) => {
+  gm(path).resize(512, 512, '!').write(newPath, err => {
+    if (err) reject(err);
+    else resolve();
+  });
+});
+
+const makeNegative = (path, newPath) => new Promise((resolve, reject) => {
+  gm(path).negative().write(newPath, err => {
+    if (err) reject(err);
+    else resolve();
+  });
+});
+
+const makeSepia = (path, newPath) => new Promise((resolve, reject) => {
+  gm(path).sepia().write(newPath, err => {
+    if (err) reject(err);
+    else resolve();
+  });
+});
+
+const modifyPath = data => {
+  const { path, oper } = data;
+  let ext;
+  if (oper === 'Sticker') ext = '.png';
+  else ext = '.jpeg';
+  const dotIndex = path.lastIndexOf('.');
+  const beforeExt = path.slice(0, dotIndex);
+  return beforeExt + '_edited' + ext;
+};
+
+const renameImage = (path, id) => {
+  const slashIndex = path.lastIndexOf('/');
+  const dirs = path.slice(0, slashIndex + 1);
+  return dirs + id + '.jpeg';
+};
+
+const getMediaType = (msg) => {
+  const slashIndex = msg.document.mime_type.lastIndexOf('/');
+  return msg.document.mime_type.slice(0, slashIndex);
+};
+
+const sendEditedPhoto = async (bot, chatId, data) => {
+  const newPath = modifyPath(data);
+  const cases = {
+    'Sticker': makeSticker,
+    'Negative': makeNegative,
+    'Sepia': makeSepia,
+  };
+  await cases[data.oper](data.path, newPath).catch(console.log);
+  bot.sendDocument(chatId, newPath);
+  fs.rm(newPath, err => {
+    if (err) console.log(err);
+  });
+};
+
+//danya functions
+
 module.exports = {
-  randomFilm,
-  mGetKinopoiskFilms,
-  mGetImdbFilms,
-  getKinopoiskFilmFromImdb,
   getFilmsByKeywords,
-  filmInfo,
-  kinopoiskKeyWordLinkGenerator,
-  options,
-  makeRequest,
   getFilmByTitle,
+  renameImage,
+  inlineKeyboardFilters,
+  sendRandomFilm,
+  sendEditedPhoto,
+  getMediaType
 };

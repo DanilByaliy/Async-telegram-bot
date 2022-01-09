@@ -11,14 +11,16 @@
     "url": "git+https://github.com/BogPin/ff_bot.git"
   },
   "author": "Bohdan Pinchuk",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/BogPin/ff_bot/issues"
   },
   "homepage": "https://github.com/BogPin/ff_bot#readme",
   "dependencies": {
-    "node-fetch": "^2.6.6",
-    "node-telegram-bot-api": "^0.56.0",
-    "request": "^2.88.2"
+    "request": "^2.88.2",
+    "dotenv": "^10.0.0",
+    "gm": "^1.23.1",
+    "node": "^17.3.0",
+    "node-telegram-bot-api": "^0.56.0"
   }
 }
