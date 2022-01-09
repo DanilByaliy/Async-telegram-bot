@@ -3,7 +3,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const defs = require('./definitions');
 const { session } = defs;
-require('dotenv').config();
 const {
   randomFilm,
   mGetKinopoiskFilms,
@@ -11,10 +10,11 @@ const {
   getKinopoiskFilmFromImdb,
   filmInfo,
   getFilmsByKeywords,
+  getFilmByTitle,
 } = require('./funcs');
 
-const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN2, {
-  polling: true,
+const bot = new TelegramBot('5005725004:AAHf6xAd8aZ3w7UO6_pksEA7g1X1e4H4Avc', {
+  polling: true
 });
 
 let status = session.none;
@@ -39,9 +39,10 @@ bot.on('polling_error', (onerror) => {
 });
 
 bot.on('message', async (msg) => {
+  const chatId = msg.chat.id;
   switch (status) {
     case session.none:
-      bot.sendMessage(msg.chat.id, 'Для работы с ботом выберите функцию👇', {
+      bot.sendMessage(chatId, 'Для работы с ботом выберите функцию👇', {
         reply_markup: {
           keyboard: defs.home,
           resize_keyboard: true,
@@ -49,7 +50,8 @@ bot.on('message', async (msg) => {
       });
       break;
     case session.filmByTitle:
-
+      const filmInfo = getFilmByTitle(msg.text);
+      bot.sendPhoto(chatId, filmInfo.poster, { caption: filmInfo.caption })
       status = session.none;
       break;
     case session.filmsByKeywords:
@@ -57,7 +59,7 @@ bot.on('message', async (msg) => {
       let messageText;
       if (films !== '') messageText = films;
       else messageText = 'Ничего не найдено(';
-      bot.sendMessage(msg.chat.id, messageText);
+      bot.sendMessage(chatId, messageText);
       status = session.none;
       break;
   }

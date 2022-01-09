@@ -48,6 +48,7 @@ const kinopoiskKeyWordLinkGenerator = (keyWords) => {
 };
 
 const filmInfo = (film) => {
+  if ( film === undefined ) return { poster: undefined, caption: 'Не найдено' }
   let genreOfFilm = '';
   for (const genre of film.genres) {
     if (film.genres.indexOf(genre) === film.genres.length - 1) {
@@ -128,6 +129,13 @@ const getFilmsByKeywords = async (keywords) => {
   return msg;
 };
 
+const getFilmByTitle =  async (title) => {
+  const link = kinopoiskKeyWordLinkGenerator(title);
+  const res = await makeRequest(options(link)).catch(loger);
+  console.log(res.films[0]);
+  return filmInfo(res.films[0]);
+}
+
 const randomFilm = (films) => films[Math.floor(Math.random() * films.length)];
 
 module.exports = {
@@ -140,4 +148,5 @@ module.exports = {
   kinopoiskKeyWordLinkGenerator,
   options,
   makeRequest,
+  getFilmByTitle,
 };
