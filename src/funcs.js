@@ -47,7 +47,7 @@ const kinopoiskKeyWordLinkGenerator = (keyWords) => {
   return preLink + encodeURI(keyWords) + postLink;
 };
 
-const sendFilm = (film) => {
+const filmInfo = (film) => {
   let genreOfFilm = '';
   for (const genre of film.genres) {
     if (film.genres.indexOf(genre) === film.genres.length - 1) {
@@ -102,6 +102,32 @@ const getKinopoiskFilmFromImdb = async (film) => {
   return res.items[0];
 };
 
+const getFilmsByKeywords = async (keywords) => {
+  const filmsArr = [];
+  const link = kinopoiskKeyWordLinkGenerator(keywords);
+  const res = await makeRequest(options(link)).catch(loger);
+  filmsArr.push(...res.films);
+  for (let page = 2; page <= res.pagesCount; page++) {
+    const res = await makeRequest(options(link)).catch(loger);
+    filmsArr.push(...res.films);
+  }
+  const filtered = res.films.filter((film) => {
+    const ratingFilter = parseInt(film.rating) > defs.preferableMinimumRating;
+    const typeFilter = defs.preferableTypes.some((type) => type === film.type);
+    return ratingFilter & typeFilter;
+  });
+  let msg = '';
+  for (const film of filtered) {
+    let type;
+    if (film.type === 'FILM') type = 'полнометражный фильм';
+    else type = 'cериал';
+    if (filtered.indexOf(film) !== filtered.length - 1) {
+      msg += `${film.nameRu}, ${film.year}, тип: ${type}, рейтинг: ${film.rating}/10\n`;
+    } else msg += `${film.nameRu}, ${film.year}, тип: ${type}, рейтинг: ${film.rating}/10`;
+  }
+  return msg;
+};
+
 const randomFilm = (films) => films[Math.floor(Math.random() * films.length)];
 
 module.exports = {
@@ -109,7 +135,8 @@ module.exports = {
   mGetKinopoiskFilms,
   mGetImdbFilms,
   getKinopoiskFilmFromImdb,
-  sendFilm,
+  getFilmsByKeywords,
+  filmInfo,
   kinopoiskKeyWordLinkGenerator,
   options,
   makeRequest,

@@ -2,34 +2,36 @@
 
 const TelegramBot = require('node-telegram-bot-api');
 const defs = require('./definitions');
+const { session } = defs;
+require('dotenv').config();
 const {
   randomFilm,
   mGetKinopoiskFilms,
   mGetImdbFilms,
   getKinopoiskFilmFromImdb,
-  sendFilm,
-  kinopoiskKeyWordLinkGenerator,
-  options,
-  makeRequest,
+  filmInfo,
+  getFilmsByKeywords,
 } = require('./funcs');
 
-const bot = new TelegramBot('5005725004:AAHf6xAd8aZ3w7UO6_pksEA7g1X1e4H4Avc', {
+const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN2, {
   polling: true,
 });
 
+let status = session.none;
+
 bot.on('callback_query', async (query) => {
   const chatId = query.message.chat.id;
-  const info = JSON.parse(query.data);
+  const buttonInfo = JSON.parse(query.data);
   bot.sendMessage(chatId, 'Ищем подходящий фильм 🎥');
   let film;
-  if (info.api === 'kinopoisk') {
-    film = randomFilm(await mGetKinopoiskFilms(info.genre));
+  if (buttonInfo.api === 'kinopoisk') {
+    film = randomFilm(await mGetKinopoiskFilms(buttonInfo.genre));
   } else {
-    const randFilm = randomFilm(await mGetImdbFilms(info.genre));
+    const randFilm = randomFilm(await mGetImdbFilms(buttonInfo.genre));
     film = await getKinopoiskFilmFromImdb(randFilm);
   }
-  const res = sendFilm(film);
-  bot.sendPhoto(chatId, res.poster, { caption: res.caption });
+  const info = filmInfo(film);
+  bot.sendPhoto(chatId, info.poster, { caption: info.caption });
 });
 
 bot.on('polling_error', (onerror) => {
@@ -37,19 +39,38 @@ bot.on('polling_error', (onerror) => {
 });
 
 bot.on('message', async (msg) => {
-  const filmsArr = [];
-  const link = kinopoiskKeyWordLinkGenerator(msg.text);
-  const res = await makeRequest(options(link)).catch((err) => console.log(err));
+  switch (status) {
+    case session.none:
+      bot.sendMessage(msg.chat.id, 'Для работы с ботом выберите функцию👇', {
+        reply_markup: {
+          keyboard: defs.home,
+          resize_keyboard: true,
+        },
+      });
+      break;
+    case session.filmByTitle:
 
-  for (let page = 1; page <= res.pagesCount; page++) {
-    const res = await makeRequest(options).catch((err) => console.log(err));
-    filmsArr.push(...res.films);
+      status = session.none;
+      break;
+    case session.filmsByKeywords:
+      const films = await getFilmsByKeywords(msg.text);
+      let messageText;
+      if (films !== '') messageText = films;
+      else messageText = 'Ничего не найдено(';
+      bot.sendMessage(msg.chat.id, messageText);
+      status = session.none;
+      break;
   }
-  const filtered = res.films.filter((value) => parseInt(value.rating) > 6);
-  for (const film of filtered) {
-    const cap = `Название: ${film.nameRu}\nГод выпуска: ${film.year}\nРейтинг: ${film.rating}`;
-    bot.sendPhoto(msg.chat.id, film.posterUrl, { caption: cap });
-  }
+});
+
+bot.onText(/Фильм по названию/, (msg) => {
+  bot.sendMessage(msg.chat.id, 'Введите название фильма');
+  status = session.filmByTitle;
+});
+
+bot.onText(/Фильмы по ключевым словам/, (msg) => {
+  bot.sendMessage(msg.chat.id, 'Введите название фильма');
+  status = session.filmsByKeywords;
 });
 
 bot.onText(/Случайный фильм/, (msg) => {
@@ -58,10 +79,6 @@ bot.onText(/Случайный фильм/, (msg) => {
       inline_keyboard: defs.genres,
     },
   });
-});
-
-bot.onText(/\/' '/, (msg) => {
-  bot.sendMessage(msg.chat.id, 'ваш фильм');
 });
 
 bot.onText(/\/start/, (msg) => {

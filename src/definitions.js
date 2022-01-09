@@ -1,6 +1,15 @@
 'use strict';
 module.exports = {
-  home: [['Фильм по ключевым словам'], ['Случайный фильм']],
+  session: {
+    none: 0,
+    filmByTitle: 1,
+    filmsByKeywords: 2,
+  },
+  home: [
+    ['Фильм по названию'],
+    ['Фильмы по ключевым словам'],
+    ['Случайный фильм'],
+  ],
   genres: [
     [
       {
@@ -93,4 +102,6 @@ module.exports = {
     'https://kinopoiskapiunofficial.tech/api/v2.1/films/search-by-keyword?keyword=',
   kinopoiskKeyWordPostlink: '&page=1',
   kinopoiskApiPagesCount: 20,
+  preferableMinimumRating: 6,
+  preferableTypes: ['FILM', 'TV_SERIES'],
 };
