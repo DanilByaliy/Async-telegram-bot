@@ -16,15 +16,16 @@ const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
 bot.on('callback_query', async (query) => {
   const chatId = query.message.chat.id;
   const info = JSON.parse(query.data);
-  bot.sendMessage(chatId, 'Ищем для вас подходящий фильм 🎥');
+  bot.sendMessage(chatId, 'Ищем подходящий фильм 🎥');
   let film;
   if (info.api === 'kinopoisk') {
     film = randomFilm(await mGetKinopoiskFilms(info.genre));
   } else {
-    const randomFilm = randomFilm(await mGetImdbFilms(info.genre));
-    film = await getKinopoiskFilmFromImdb(randomFilm);
+    const randFilm = randomFilm(await mGetImdbFilms(info.genre));
+    film = await getKinopoiskFilmFromImdb(randFilm);
   }
-  sendFilm(film, chatId);
+  const res = sendFilm(film);
+  bot.sendPhoto(chatId, res.poster, { caption: res.caption });
 });
 
 bot.on('polling_error', (onerror) => {

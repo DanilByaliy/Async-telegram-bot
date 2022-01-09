@@ -41,24 +41,22 @@ const kinopoiskFromImdbLinkGenerator = (id) => {
   return preLink + id + postLink;
 };
 
-const sendFilm = (film, chatId) => {
-  let genreOfFilm = ' ';
+const sendFilm = (film) => {
+  let genreOfFilm = '';
   for (const genre of film.genres) {
     if (film.genres.indexOf(genre) === film.genres.length - 1) {
       genreOfFilm += genre.genre;
-    } else {
-      genreOfFilm += genre.genre + ', ';
-    }
+    } else genreOfFilm += genre.genre + ', ';
   }
-  const cap =
+  const caption =
     `Название: ${film.nameRu}\nГод выпуска: ${film.year}\n` +
     `Рейтинг: ${film.ratingImdb}\nЖанры: ${genreOfFilm}`;
-  bot.sendPhoto(chatId, film.posterUrl, { caption: cap });
+  return { poster: film.posterUrl, caption };
 };
 
-const options = (genre, page) => ({
+const options = (link) => ({
   method: 'GET',
-  url: kinopoiskLinkGenerator(genre, page),
+  url: link,
   headers: {
     'X-API-KEY': '4763ee9d-133f-4291-ae48-6066a1ba76bb',
     'Content-Type': 'application/json',
@@ -68,7 +66,8 @@ const options = (genre, page) => ({
 const getKinopoiskFilms = async (genre) => {
   const kinopoiskFilmsArr = [];
   for (let page = 1; page <= defs.kinopoiskApiPagesCount; page++) {
-    const result = await makeRequest(options(genre, page)).catch(loger);
+    const link = kinopoiskLinkGenerator(genre, page);
+    const result = await makeRequest(options(link)).catch(loger);
     kinopoiskFilmsArr.push(...result.items);
   }
   console.log({ length: kinopoiskFilmsArr.length });
@@ -92,16 +91,17 @@ const getImdbFilms = async (genre) => {
 const mGetImdbFilms = memoize(getImdbFilms);
 
 const getKinopoiskFilmFromImdb = async (film) => {
-  const options = {
-    method: 'GET',
-    url: kinopoiskFromImdbLinkGenerator(film.id),
-    headers: {
-      'X-API-KEY': '4763ee9d-133f-4291-ae48-6066a1ba76bb',
-      'Content-Type': 'application/json',
-    },
-  };
-  const res = await makeRequest(options).catch(loger);
+  const link = kinopoiskFromImdbLinkGenerator(film.id);
+  const res = await makeRequest(options(link)).catch(loger);
   return res.items[0];
 };
 
 const randomFilm = (films) => films[Math.floor(Math.random() * films.length)];
+
+module.exports = {
+  randomFilm,
+  mGetKinopoiskFilms,
+  mGetImdbFilms,
+  getKinopoiskFilmFromImdb,
+  sendFilm
+};
