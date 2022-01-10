@@ -18,7 +18,7 @@ const {
   startMsg,
 } = require('./funcs');
 
-const token = process.env.TELEGRAM_BOT_TOKEN2;
+const token = process.env.TELEGRAM_BOT_TOKEN;
 
 const bot = new TelegramBot(token, {
   polling: {
