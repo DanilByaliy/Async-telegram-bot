@@ -53,9 +53,9 @@ This multifunctional bot is written in node.js whit async functions. This bot ca
 
 
 ## Participants:
-	* Nikita Gryshak - https://github.com/holdennekt
-	* Bohdan Pinchuk - https://github.com/BogPin
-	* Danil Byaliy - https://github.com/DanilByaliy
+ * Nikita Gryshak - https://github.com/holdennekt
+ * Bohdan Pinchuk - https://github.com/BogPin
+ * Danil Byaliy - https://github.com/DanilByaliy
 
 ## License
 This program is distributed under an [MIT License](https://github.com/DanilByaliy/Async-telegram-bot/blob/main/LICENSE).
