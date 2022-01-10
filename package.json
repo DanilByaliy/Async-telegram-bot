@@ -1,23 +1,40 @@
 {
-  "name": "async-telegram-bot",
+  "name": "ff_bot",
   "version": "1.0.0",
-  "description": "",
-  "main": "bot.js",
+  "description": "random film finder bot",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DanilByaliy/Async-telegram-bot.git"
+    "url": "git+https://github.com/BogPin/ff_bot.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Danyl Byaliy Nikita Gryshchak Bohdan Pinchuk",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/DanilByaliy/Async-telegram-bot/issues"
+    "url": "https://github.com/BogPin/ff_bot/issues"
   },
-  "homepage": "https://github.com/DanilByaliy/Async-telegram-bot#readme",
+  "homepage": "https://github.com/BogPin/ff_bot#readme",
   "dependencies": {
     "dotenv": "^10.0.0",
-    "node-telegram-bot-api": "^0.56.0"
+    "gm": "^1.23.1",
+    "node": "^17.3.0",
+    "node-telegram-bot-api": "^0.56.0",
+    "pureimage": "^0.3.8",
+    "request": "^2.88.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-preset-es2015": "^6.24.1",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.2.0",
+    "prettier": "2.5.1"
   }
 }
