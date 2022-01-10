@@ -3,7 +3,7 @@ const fs = require('fs');
 
 function getMonthCode(month) {
   return CONSTANTS.CODE_OF_MONTHS[Number(month)];
-};
+}
 
 function getYearCode(year) {
   year = correctionYear(year);
@@ -13,7 +13,7 @@ function getYearCode(year) {
   return (centuryIndex + lastTwoDigitsOfYear +
     Math.floor(lastTwoDigitsOfYear / CONSTANTS.FOR_YEAR_CODE)) %
         CONSTANTS.NUMBER_DAYS_OF_WEEK;
-};
+}
 
 function correctionYear(year) {
   if (year.length < CONSTANTS.MIN_YEAR_LENGHT) year += CONSTANTS.DOUBLE_ZERO;
@@ -25,21 +25,21 @@ function checkLeapYear(year) {
   return ((year % CONSTANTS.INDEX_CHECK_LEAP_YEAR === 0 &&
     (year % CONSTANTS.INDEX_CHECK_LEAP_YEAR_2 !== 0)) ||
     (year % CONSTANTS.INDEX_CHECK_LEAP_YEAR_3 === 0));
-};
+}
 
 function correctionLeapYear(year, month) {
   if (checkLeapYear(year) && Number(month) < CONSTANTS.MARCH) {
     return -1;
-  };
+  }
   return 0;
-};
+}
 
 function getDayOfWeek(numberDay, correction, codeMons, codeYear) {
   const numberOfDays = CONSTANTS.NUMBER_DAYS_OF_WEEK;
   const dayOfWeek = (correction + Number(numberDay) + codeMons + codeYear) %
     numberOfDays;
   return ((dayOfWeek + CONSTANTS.FOR_DAY) % numberOfDays) + 1;
-};
+}
 
 function getNumberOfDaysPerMonth(month, year) {
   let dayOfMonth;
@@ -53,7 +53,7 @@ function getNumberOfDaysPerMonth(month, year) {
     } else dayOfMonth = CONSTANTS.NUM_DAYS_OF_SMALL_FEBRUARY;
   } else dayOfMonth = CONSTANTS.NUM_DAYS_OF_BIG_MONTHS - (month % 2);
   return dayOfMonth;
-};
+}
 
 function checkForPartition(i) {
   const numDayOfWeek = CONSTANTS.NUMBER_DAYS_OF_WEEK;

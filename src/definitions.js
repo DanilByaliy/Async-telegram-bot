@@ -1,60 +1,58 @@
-'use strict';
+
 module.exports = {
   session: {
     none: 0,
     filmByTitle: 1,
-    filmsByKeywords: 2,
-    randomFilm: 3,
-    editPhoto: 4,
+    filmsByKeywords: 2
   },
   home: [
     ['Фильм по названию'],
     ['Фильмы по ключевым словам'],
-    ['Случайный фильм'],
+    ['Случайный фильм']
   ],
   inlineButtonsGenres: [
     [
       {
         text: 'Боевик',
-        callback_data: JSON.stringify({ api: 'imdb', genre: 'action', t: 'film' }),
+        callback_data: JSON.stringify({ api: 'imdb', genre: 'action', t: 'film' })
       },
       {
         text: 'Мультфильм',
-        callback_data: JSON.stringify({ api: 'imdb', genre: 'animation', t: 'film' }),
+        callback_data: JSON.stringify({ api: 'imdb', genre: 'animation', t: 'film' })
       },
       {
         text: 'Комедия',
-        callback_data: JSON.stringify({ api: 'imdb', genre: 'comedy', t: 'film' }),
-      },
+        callback_data: JSON.stringify({ api: 'imdb', genre: 'comedy', t: 'film' })
+      }
     ],
     [
       {
         text: 'Фантастика',
-        callback_data: JSON.stringify({ api: 'imdb', genre: 'fantasy', t: 'film' }),
+        callback_data: JSON.stringify({ api: 'imdb', genre: 'fantasy', t: 'film' })
       },
       {
         text: 'Ужасы',
-        callback_data: JSON.stringify({ api: 'imdb', genre: 'horror', t: 'film' }),
+        callback_data: JSON.stringify({ api: 'imdb', genre: 'horror', t: 'film' })
       },
       {
         text: 'Триллер',
-        callback_data: JSON.stringify({ api: 'imdb', genre: 'thriller', t: 'film' }),
-      },
+        callback_data: JSON.stringify({ api: 'imdb', genre: 'thriller', t: 'film' })
+      }
     ],
     [
       {
         text: 'Драма',
-        callback_data: JSON.stringify({ api: 'imdb', genre: 'drama', t: 'film' }),
+        callback_data: JSON.stringify({ api: 'imdb', genre: 'drama', t: 'film' })
       },
       {
         text: 'Аниме',
-        callback_data: JSON.stringify({ api: 'kinopoisk', genre: 24, t: 'film' }),
+        callback_data: JSON.stringify({ api: 'kinopoisk', genre: 24, t: 'film' })
       },
       {
         text: 'Детектив',
-        callback_data: JSON.stringify({ api: 'imdb', genre: 'crime', t: 'film' }),
-      },
-    ],
+        callback_data: JSON.stringify({ api: 'imdb', genre: 'crime', t: 'film' })
+      }
+    ]
   ],
   kinopoiskAnimeId: 24,
   imdbPrelink:
@@ -71,5 +69,5 @@ module.exports = {
   kinopoiskKeyWordPostlink: '&page=1',
   kinopoiskApiPagesCount: 20,
   preferableMinimumRating: 6,
-  preferableTypes: ['FILM', 'TV_SERIES'],
+  preferableTypes: ['FILM', 'TV_SERIES']
 };

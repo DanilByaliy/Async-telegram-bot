@@ -3,7 +3,34 @@ const defs = require('./definitions');
 const gm = require('gm');
 const fs = require('fs');
 
-//bohdan functions
+const startMsg = (msg) =>
+  `Приветствую, ${msg.from.first_name}\n` +
+  'Пришлите фото, текст в виде "/calendar 01.2022" или выберите функцию👇';
+
+const onRandomText = (msg, bot) => {
+  const msgText = 'Для работы с ботом пришлите фото или выберите функцию👇';
+  bot.sendMessage(msg.chat.id, msgText, {
+    reply_markup: {
+      keyboard: defs.home,
+      resize_keyboard: true,
+    },
+  });
+};
+
+const onFilmByTitle = async (msg, bot) => {
+  const filmInfo = await getFilmByTitle(msg.text);
+  bot.sendPhoto(msg.chat.id, filmInfo.poster, { caption: filmInfo.caption });
+};
+
+const onFilmByKeywords = async (msg, bot) => {
+  const films = await getFilmsByKeywords(msg.text);
+  let messageText;
+  if (films !== '') messageText = films;
+  else messageText = 'Ничего не найдено(';
+  bot.sendMessage(msg.chat.id, messageText);
+};
+
+// bohdan functions
 
 const memoize = (fn) => {
   const cache = Object.create(null);
@@ -127,8 +154,9 @@ const getFilmsByKeywords = async (keywords) => {
     else type = 'cериал';
     if (filtered.indexOf(film) !== filtered.length - 1) {
       msg += `${film.nameRu}, ${film.year}, тип: ${type}, рейтинг: ${film.rating}/10\n`;
-    } else
+    } else {
       msg += `${film.nameRu}, ${film.year}, тип: ${type}, рейтинг: ${film.rating}/10`;
+    }
   }
   return msg.replace(/undefined/, 'отсутствует');
 };
@@ -156,16 +184,16 @@ const sendRandomFilm = async (bot, chatId, data) => {
   bot.sendPhoto(chatId, info.poster, { caption: info.caption });
 };
 
-//nikita functions
+// nikita functions
 
 const inlineButtonFilter = (oper, path) => ({
   text: oper,
-  callback_data: JSON.stringify({ oper, path, t: 'photo' })
+  callback_data: JSON.stringify({ oper, path, t: 'photo' }),
 });
 
-const inlineKeyboardFilters = path => {
+const inlineKeyboardFilters = (path) => {
   const markup = {
-    inline_keyboard: [[]]
+    inline_keyboard: [[]],
   };
   for (const elem of ['Sticker', 'Negative', 'Sepia']) {
     markup.inline_keyboard[0].push(inlineButtonFilter(elem, path));
@@ -173,28 +201,37 @@ const inlineKeyboardFilters = path => {
   return markup;
 };
 
-const makeSticker = (path, newPath) => new Promise((resolve, reject) => {
-  gm(path).resize(512, 512, '!').write(newPath, err => {
-    if (err) reject(err);
-    else resolve();
+const makeSticker = (path, newPath) =>
+  new Promise((resolve, reject) => {
+    gm(path)
+      .resize(512, 512, '!')
+      .write(newPath, (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
   });
-});
 
-const makeNegative = (path, newPath) => new Promise((resolve, reject) => {
-  gm(path).negative().write(newPath, err => {
-    if (err) reject(err);
-    else resolve();
+const makeNegative = (path, newPath) =>
+  new Promise((resolve, reject) => {
+    gm(path)
+      .negative()
+      .write(newPath, (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
   });
-});
 
-const makeSepia = (path, newPath) => new Promise((resolve, reject) => {
-  gm(path).sepia().write(newPath, err => {
-    if (err) reject(err);
-    else resolve();
+const makeSepia = (path, newPath) =>
+  new Promise((resolve, reject) => {
+    gm(path)
+      .sepia()
+      .write(newPath, (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
   });
-});
 
-const modifyPath = data => {
+const modifyPath = (data) => {
   const { path, oper } = data;
   let ext;
   if (oper === 'Sticker') ext = '.png';
@@ -218,25 +255,27 @@ const getMediaType = (msg) => {
 const sendEditedPhoto = async (bot, chatId, data) => {
   const newPath = modifyPath(data);
   const cases = {
-    'Sticker': makeSticker,
-    'Negative': makeNegative,
-    'Sepia': makeSepia,
+    Sticker: makeSticker,
+    Negative: makeNegative,
+    Sepia: makeSepia,
   };
   await cases[data.oper](data.path, newPath).catch(console.log);
   bot.sendDocument(chatId, newPath);
-  fs.rm(newPath, err => {
+  fs.rm(newPath, (err) => {
     if (err) console.log(err);
   });
 };
 
-//danya functions
+// danya functions
 
 module.exports = {
-  getFilmsByKeywords,
-  getFilmByTitle,
   renameImage,
   inlineKeyboardFilters,
   sendRandomFilm,
   sendEditedPhoto,
-  getMediaType
+  getMediaType,
+  onRandomText,
+  onFilmByTitle,
+  onFilmByKeywords,
+  startMsg,
 };
